@@ -4,6 +4,24 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+
+from app.db.database import get_db
+from app.models.inventory import InventoryItem
+from app.core.deps import get_current_user
+from fastapi import Depends
+from app.core.security import oauth2_scheme
+
+router = APIRouter(prefix="/inventory", tags=["Inventory"])
+
+
+@router.get("/")
+def get_inventory(
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme)
+):
+    return db.query(InventoryItem).all()
 
 from app.schemas.inventory import (
     InventoryCreate,
@@ -92,4 +110,11 @@ def remove_item(
 
     return {
         "message": "Item deleted successfully"
+    }
+    
+@router.get("/protected")
+def protected_route(token: str = Depends(oauth2_scheme)):
+    return {
+        "message": "You are authenticated",
+        "token": token
     }

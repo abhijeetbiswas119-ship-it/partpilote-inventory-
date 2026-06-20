@@ -1,6 +1,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordBearer
 
 from app.db.database import get_db
 
@@ -27,7 +28,6 @@ def register(
     user_data: UserRegister,
     db: Session = Depends(get_db)
 ):
-
     user = register_user(user_data, db)
 
     if not user:
@@ -37,20 +37,19 @@ def register(
         )
 
     return {
-        "message": "User registered successfully"
+        "message": "User registered successfully",
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role
+        }
     }
 
 
 # Login
-@router.post(
-    "/login",
-    response_model=TokenResponse
-)
-def login(
-    user_data: UserLogin,
-    db: Session = Depends(get_db)
-):
-
+@router.post("/login", response_model=TokenResponse)
+def login(user_data: UserLogin, db: Session = Depends(get_db)):
     token = login_user(user_data, db)
 
     if not token:

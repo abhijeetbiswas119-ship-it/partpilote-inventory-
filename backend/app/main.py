@@ -9,6 +9,12 @@ from app.routers import inventory
 from app.routers import inventory
 from app.routers import category
 from app.routers import auth
+from fastapi import FastAPI
+from fastapi.security import OAuth2PasswordBearer
+
+app = FastAPI()
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 # Create FastAPI app
 app = FastAPI(
